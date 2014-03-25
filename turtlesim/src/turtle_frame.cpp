@@ -31,9 +31,10 @@
 
 #include <QPointF>
 
-#include <ros/package.h>
+//#include <ros/package.h>
 #include <cstdlib>
 #include <ctime>
+#include <unistd.h>
 
 #define DEFAULT_BG_R 0x45
 #define DEFAULT_BG_G 0x56
@@ -77,7 +78,11 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
   turtles.append("hydro.svg");
 
   //QString images_path = (ros::package::getPath("turtlesim") + "/images/").c_str();
-  QString images_path = "";
+  char cwd[PATH_MAX];
+  getcwd(cwd, sizeof(cwd));
+  std::string path(cwd);
+  path += "/../images/";
+  QString images_path = path.c_str();
   for (size_t i = 0; i < turtles.size(); ++i)
   {
     QImage img;
@@ -186,7 +191,7 @@ void TurtleFrame::clear()
 void TurtleFrame::onUpdate()
 {
   //ros::spinOnce();
-  nh_->spin();
+  nh_->spin_once();
 
   updateTurtles();
 

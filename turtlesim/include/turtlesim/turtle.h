@@ -40,6 +40,7 @@
 # include <turtlesim/Pose.h>
 # include "turtlesim/dds_impl/Pose_convert.h"
 # include <geometry_msgs/Twist.h>
+//# include "geometry_msgs/dds_impl/Twist_convert.h"
 # include <turtlesim/SetPen.h>
 # include <turtlesim/TeleportRelative.h>
 # include <turtlesim/TeleportAbsolute.h>
@@ -66,7 +67,8 @@ public:
   bool update(double dt, QPainter& path_painter, const QImage& path_image, qreal canvas_width, qreal canvas_height);
   void paint(QPainter &painter);
 private:
-  void velocityCallback(const geometry_msgs::Twist::ConstPtr& vel);
+  void velocityCallback(geometry_msgs::Twist::ConstPtr vel);
+  void velocityCallback2(Pose::ConstPtr vel);
   bool setPenCallback(turtlesim::SetPen::Request&, turtlesim::SetPen::Response&);
   bool teleportRelativeCallback(turtlesim::TeleportRelative::Request&, turtlesim::TeleportRelative::Response&);
   bool teleportAbsoluteCallback(turtlesim::TeleportAbsolute::Request&, turtlesim::TeleportAbsolute::Response&);
@@ -88,7 +90,8 @@ private:
   QPen pen_;
 
   //ros::Subscriber velocity_sub_;
-  std::shared_ptr<rclcpp::subscription::Subscription<geometry_msgs::Twist> > velocity_sub_;
+  //std::shared_ptr<rclcpp::subscription::Subscription<geometry_msgs::Twist> > velocity_sub_;
+  std::shared_ptr<rclcpp::subscription::Subscription<Pose> > velocity_sub_;
   //ros::Publisher pose_pub_;
   std::shared_ptr<rclcpp::publisher::Publisher<Pose> > pose_pub_;
   //ros::Publisher color_pub_;

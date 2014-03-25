@@ -53,7 +53,7 @@ Turtle::Turtle(std::shared_ptr<rclcpp::node::Node> nh, const QImage& turtle_imag
   pen_.setWidth(3);
 
   //velocity_sub_ = nh_.subscribe("cmd_vel", 1, &Turtle::velocityCallback, this);
-  //velocity_sub_ = nh_->create_subscription<geometry_msgs::Twist>("cmd_vel", 1, ...);
+  velocity_sub_ = nh_->create_subscription<Pose>("cmd_vel", 1, std::bind(&Turtle::velocityCallback2, this, std::placeholders::_1));
   //pose_pub_ = nh_.advertise<Pose>("pose", 1);
   pose_pub_ = nh_->create_publisher<Pose>("pose", 1);
   //color_pub_ = nh_.advertise<Color>("color_sensor", 1);
@@ -66,8 +66,15 @@ Turtle::Turtle(std::shared_ptr<rclcpp::node::Node> nh, const QImage& turtle_imag
   rotateImage();
 }
 
+void Turtle::velocityCallback2(Pose::ConstPtr vel)
+{
+  geometry_msgs::Twist::Ptr tw(new geometry_msgs::Twist);
+  tw->linear.x = vel->linear_velocity;
+  tw->angular.z = vel->angular_velocity;
+  velocityCallback(tw);
+}
 
-void Turtle::velocityCallback(const geometry_msgs::Twist::ConstPtr& vel)
+void Turtle::velocityCallback(geometry_msgs::Twist::ConstPtr vel)
 {
   last_command_time_ = ros::WallTime::now();
   lin_vel_ = vel->linear.x;

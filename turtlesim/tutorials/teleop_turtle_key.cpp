@@ -1,5 +1,8 @@
-#include <ros/ros.h>
-#include <geometry_msgs/Twist.h>
+//#include <ros/ros.h>
+# include <rclcpp/rclcpp.hpp>
+//#include <geometry_msgs/Twist.h>
+#include <turtlesim/Pose.h>
+#include <turtlesim/dds_impl/Pose_convert.h>
 #include <signal.h>
 #include <termios.h>
 #include <stdio.h>
@@ -19,9 +22,11 @@ public:
 private:
 
   
-  ros::NodeHandle nh_;
+  //ros::NodeHandle nh_;
+  std::shared_ptr<rclcpp::node::Node> nh_;
   double linear_, angular_, l_scale_, a_scale_;
-  ros::Publisher twist_pub_;
+  //ros::Publisher twist_pub_;
+  std::shared_ptr<rclcpp::publisher::Publisher<turtlesim::Pose> > twist_pub_;
   
 };
 
@@ -31,10 +36,13 @@ TeleopTurtle::TeleopTurtle():
   l_scale_(2.0),
   a_scale_(2.0)
 {
-  nh_.param("scale_angular", a_scale_, a_scale_);
-  nh_.param("scale_linear", l_scale_, l_scale_);
+  //nh_.param("scale_angular", a_scale_, a_scale_);
+  //nh_.param("scale_linear", l_scale_, l_scale_);
 
-  twist_pub_ = nh_.advertise<geometry_msgs::Twist>("turtle1/cmd_vel", 1);
+  nh_ = rclcpp::create_node("teleop_turtle");
+
+  //twist_pub_ = nh_.advertise<geometry_msgs::Twist>("turtle1/cmd_vel", 1);
+  twist_pub_ = nh_->create_publisher<turtlesim::Pose>("cmd_vel", 1);
 }
 
 int kfd = 0;
@@ -43,14 +51,15 @@ struct termios cooked, raw;
 void quit(int sig)
 {
   tcsetattr(kfd, TCSANOW, &cooked);
-  ros::shutdown();
+  //ros::shutdown();
   exit(0);
 }
 
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "teleop_turtle");
+  //ros::init(argc, argv, "teleop_turtle");
+  rclcpp::init(argc, argv);
   TeleopTurtle teleop_turtle;
 
   signal(SIGINT,quit);
@@ -91,39 +100,43 @@ void TeleopTurtle::keyLoop()
     }
 
     linear_=angular_=0;
-    ROS_DEBUG("value: 0x%02X\n", c);
+    //ROS_DEBUG("value: 0x%02X\n", c);
   
     switch(c)
     {
       case KEYCODE_L:
-        ROS_DEBUG("LEFT");
+        //ROS_DEBUG("LEFT");
         angular_ = 1.0;
         dirty = true;
         break;
       case KEYCODE_R:
-        ROS_DEBUG("RIGHT");
+        //ROS_DEBUG("RIGHT");
         angular_ = -1.0;
         dirty = true;
         break;
       case KEYCODE_U:
-        ROS_DEBUG("UP");
+        //ROS_DEBUG("UP");
         linear_ = 1.0;
         dirty = true;
         break;
       case KEYCODE_D:
-        ROS_DEBUG("DOWN");
+        //ROS_DEBUG("DOWN");
         linear_ = -1.0;
         dirty = true;
         break;
     }
    
 
-    geometry_msgs::Twist twist;
-    twist.angular.z = a_scale_*angular_;
-    twist.linear.x = l_scale_*linear_;
+    //geometry_msgs::Twist twist;
+    //twist.angular.z = a_scale_*angular_;
+    //twist.linear.x = l_scale_*linear_;
+    turtlesim::Pose twist;
+    twist.angular_velocity = a_scale_*angular_;
+    twist.linear_velocity = l_scale_*linear_;
     if(dirty ==true)
     {
-      twist_pub_.publish(twist);    
+      twist_pub_->publish(twist);    
+      nh_->spin_once();
       dirty=false;
     }
   }
