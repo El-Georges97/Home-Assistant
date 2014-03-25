@@ -86,7 +86,12 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
   for (size_t i = 0; i < turtles.size(); ++i)
   {
     QImage img;
-    img.load(images_path + turtles[i]);
+    bool loaded = img.load(images_path + turtles[i]);
+    if (!loaded)
+    {
+      img = QImage(45, 45, QImage::Format_ARGB32);
+      img.fill(QColor(0, 0, 0, 50));
+    }
     turtle_images_.append(img);
   }
 
