@@ -36,7 +36,6 @@
 
 // This prevents a MOC error with versions of boost >= 1.48
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-//# include <ros/ros.h>
 # include <rclcpp/rclcpp.hpp>
 
 # include <std_srvs/Empty.h>
@@ -54,7 +53,8 @@ class TurtleFrame : public QFrame
 {
   Q_OBJECT
 public:
-  TurtleFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  //TurtleFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  TurtleFrame(std::shared_ptr<rclcpp::node::Node> nh);
   ~TurtleFrame();
 
   std::string spawnTurtle(const std::string& name, float x, float y, float angle);
@@ -75,7 +75,6 @@ private:
   bool spawnCallback(turtlesim::Spawn::Request&, turtlesim::Spawn::Response&);
   bool killCallback(turtlesim::Kill::Request&, turtlesim::Kill::Response&);
 
-  //ros::NodeHandle nh_;
   std::shared_ptr<rclcpp::node::Node> nh_;
   QTimer* update_timer_;
   QImage path_image_;

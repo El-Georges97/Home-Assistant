@@ -39,7 +39,6 @@
 namespace turtlesim
 {
 
-//Turtle::Turtle(const ros::NodeHandle& nh, const QImage& turtle_image, const QPointF& pos, float orient)
 Turtle::Turtle(std::shared_ptr<rclcpp::node::Node> nh, const QImage& turtle_image, const QPointF& pos, float orient)
 : nh_(nh)
 , turtle_image_(turtle_image)
@@ -52,11 +51,9 @@ Turtle::Turtle(std::shared_ptr<rclcpp::node::Node> nh, const QImage& turtle_imag
 {
   pen_.setWidth(3);
 
-  //velocity_sub_ = nh_.subscribe("cmd_vel", 1, &Turtle::velocityCallback, this);
+  //velocity_sub_ = nh_->create_subscription<geometry_msgs::Twist>("cmd_vel", 1, std::bind(&Turtle::velocityCallback, this, std::placeholders::_1));
   velocity_sub_ = nh_->create_subscription<Pose>("cmd_vel", 1, std::bind(&Turtle::velocityCallback2, this, std::placeholders::_1));
-  //pose_pub_ = nh_.advertise<Pose>("pose", 1);
   pose_pub_ = nh_->create_publisher<Pose>("pose", 1);
-  //color_pub_ = nh_.advertise<Color>("color_sensor", 1);
   color_pub_ = nh_->create_publisher<Color>("color_sensor", 1);
   //set_pen_srv_ = nh_.advertiseService("set_pen", &Turtle::setPenCallback, this);
   //teleport_relative_srv_ = nh_.advertiseService("teleport_relative", &Turtle::teleportRelativeCallback, this);

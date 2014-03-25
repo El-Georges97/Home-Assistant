@@ -32,9 +32,7 @@
 
 // This prevents a MOC error with versions of boost >= 1.48
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-//# include <ros/ros.h>
 # include <rclcpp/rclcpp.hpp>
-//# include <boost/shared_ptr.hpp>
 # include <memory>
 
 # include <turtlesim/Pose.h>
@@ -61,7 +59,6 @@ namespace turtlesim
 class Turtle
 {
 public:
-  //Turtle(const ros::NodeHandle& nh, const QImage& turtle_image, const QPointF& pos, float orient);
   Turtle(std::shared_ptr<rclcpp::node::Node> nh, const QImage& turtle_image, const QPointF& pos, float orient);
 
   bool update(double dt, QPainter& path_painter, const QImage& path_image, qreal canvas_width, qreal canvas_height);
@@ -75,7 +72,6 @@ private:
 
   void rotateImage();
 
-  //ros::NodeHandle nh_;
   std::shared_ptr<rclcpp::node::Node> nh_;
 
   QImage turtle_image_;
@@ -89,12 +85,9 @@ private:
   bool pen_on_;
   QPen pen_;
 
-  //ros::Subscriber velocity_sub_;
   //std::shared_ptr<rclcpp::subscription::Subscription<geometry_msgs::Twist> > velocity_sub_;
   std::shared_ptr<rclcpp::subscription::Subscription<Pose> > velocity_sub_;
-  //ros::Publisher pose_pub_;
   std::shared_ptr<rclcpp::publisher::Publisher<Pose> > pose_pub_;
-  //ros::Publisher color_pub_;
   std::shared_ptr<rclcpp::publisher::Publisher<Color> > color_pub_;
   //ros::ServiceServer set_pen_srv_;
   //ros::ServiceServer teleport_relative_srv_;

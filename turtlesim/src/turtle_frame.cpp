@@ -43,8 +43,9 @@
 namespace turtlesim
 {
 
-TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
-: QFrame(parent, f)
+TurtleFrame::TurtleFrame(std::shared_ptr<rclcpp::node::Node> nh)
+: QFrame(0, 0)
+, nh_(nh)
 , path_image_(500, 500, QImage::Format_ARGB32)
 , path_painter_(&path_image_)
 , frame_count_(0)
@@ -60,8 +61,6 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
   update_timer_->start();
 
   connect(update_timer_, SIGNAL(timeout()), this, SLOT(onUpdate()));
-
-  nh_ = rclcpp::create_node("turtlesim");
 
   //nh_.setParam("background_r", DEFAULT_BG_R);
   //nh_.setParam("background_g", DEFAULT_BG_G);
@@ -195,12 +194,10 @@ void TurtleFrame::clear()
 
 void TurtleFrame::onUpdate()
 {
-  //ros::spinOnce();
   nh_->spin_once();
 
   updateTurtles();
 
-  //if (!ros::ok())
   if(!nh_->is_running())
   {
     close();
