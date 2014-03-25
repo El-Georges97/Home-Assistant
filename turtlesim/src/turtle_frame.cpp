@@ -169,7 +169,7 @@ std::string TurtleFrame::spawnTurtle(const std::string& name, float x, float y, 
     }
   }
 
-  TurtlePtr t(new Turtle(nh_, turtle_images_[rand() % turtle_images_.size()], QPointF(x, y), angle));
+  TurtlePtr t(new Turtle(nh_, real_name, turtle_images_[rand() % turtle_images_.size()], QPointF(x, y), angle));
   turtles_[real_name] = t;
   update();
 

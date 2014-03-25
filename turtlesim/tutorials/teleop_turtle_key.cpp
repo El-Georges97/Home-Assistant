@@ -1,8 +1,8 @@
-//#include <ros/ros.h>
 # include <rclcpp/rclcpp.hpp>
-//#include <geometry_msgs/Twist.h>
-#include <turtlesim/Pose.h>
-#include <turtlesim/dds_impl/Pose_convert.h>
+# include <turtlesim/Pose.h>
+# include "turtlesim/dds_impl/Pose_convert.h"
+# include <geometry_msgs/Twist.h>
+//# include "geometry_msgs/dds_impl/Twist_convert.h"
 #include <signal.h>
 #include <termios.h>
 #include <stdio.h>
@@ -13,6 +13,8 @@
 #define KEYCODE_D 0x42
 #define KEYCODE_Q 0x71
 
+std::shared_ptr<rclcpp::node::Node> g_nh;
+
 class TeleopTurtle
 {
 public:
@@ -22,10 +24,8 @@ public:
 private:
 
   
-  //ros::NodeHandle nh_;
-  std::shared_ptr<rclcpp::node::Node> nh_;
   double linear_, angular_, l_scale_, a_scale_;
-  //ros::Publisher twist_pub_;
+  //std::shared_ptr<rclcpp::publisher::Publisher<geometry_msgs::Twist> > twist_pub_;
   std::shared_ptr<rclcpp::publisher::Publisher<turtlesim::Pose> > twist_pub_;
   
 };
@@ -39,10 +39,10 @@ TeleopTurtle::TeleopTurtle():
   //nh_.param("scale_angular", a_scale_, a_scale_);
   //nh_.param("scale_linear", l_scale_, l_scale_);
 
-  nh_ = rclcpp::create_node("teleop_turtle");
+  g_nh = rclcpp::create_node("teleop_turtle");
 
-  //twist_pub_ = nh_.advertise<geometry_msgs::Twist>("turtle1/cmd_vel", 1);
-  twist_pub_ = nh_->create_publisher<turtlesim::Pose>("cmd_vel", 1);
+  //twist_pub_ = g_nh->create_publisher<geometry_msgs::Twist>("turtle1_cmd_vel", 1);
+  twist_pub_ = g_nh->create_publisher<turtlesim::Pose>("turtle1_cmd_vel", 1);
 }
 
 int kfd = 0;
@@ -51,14 +51,13 @@ struct termios cooked, raw;
 void quit(int sig)
 {
   tcsetattr(kfd, TCSANOW, &cooked);
-  //ros::shutdown();
+  g_nh->shutdown("caught a signal");
   exit(0);
 }
 
 
 int main(int argc, char** argv)
 {
-  //ros::init(argc, argv, "teleop_turtle");
   rclcpp::init(argc, argv);
   TeleopTurtle teleop_turtle;
 
@@ -136,7 +135,7 @@ void TeleopTurtle::keyLoop()
     if(dirty ==true)
     {
       twist_pub_->publish(twist);    
-      nh_->spin_once();
+      g_nh->spin_once();
       dirty=false;
     }
   }

@@ -59,7 +59,7 @@ namespace turtlesim
 class Turtle
 {
 public:
-  Turtle(std::shared_ptr<rclcpp::node::Node> nh, const QImage& turtle_image, const QPointF& pos, float orient);
+  Turtle(std::shared_ptr<rclcpp::node::Node> nh, const std::string& name, const QImage& turtle_image, const QPointF& pos, float orient);
 
   bool update(double dt, QPainter& path_painter, const QImage& path_image, qreal canvas_width, qreal canvas_height);
   void paint(QPainter &painter);
