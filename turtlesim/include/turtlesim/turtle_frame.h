@@ -36,7 +36,8 @@
 
 // This prevents a MOC error with versions of boost >= 1.48
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-# include <ros/ros.h>
+//# include <ros/ros.h>
+# include <rclcpp/rclcpp.hpp>
 
 # include <std_srvs/Empty.h>
 # include <turtlesim/Spawn.h>
@@ -74,7 +75,8 @@ private:
   bool spawnCallback(turtlesim::Spawn::Request&, turtlesim::Spawn::Response&);
   bool killCallback(turtlesim::Kill::Request&, turtlesim::Kill::Response&);
 
-  ros::NodeHandle nh_;
+  //ros::NodeHandle nh_;
+  std::shared_ptr<rclcpp::node::Node> nh_;
   QTimer* update_timer_;
   QImage path_image_;
   QPainter path_painter_;
@@ -83,10 +85,10 @@ private:
 
   ros::WallTime last_turtle_update_;
 
-  ros::ServiceServer clear_srv_;
-  ros::ServiceServer reset_srv_;
-  ros::ServiceServer spawn_srv_;
-  ros::ServiceServer kill_srv_;
+  //ros::ServiceServer clear_srv_;
+  //ros::ServiceServer reset_srv_;
+  //ros::ServiceServer spawn_srv_;
+  //ros::ServiceServer kill_srv_;
 
   typedef std::map<std::string, TurtlePtr> M_Turtle;
   M_Turtle turtles_;

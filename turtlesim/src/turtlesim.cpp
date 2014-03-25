@@ -29,20 +29,24 @@
 
 #include <QApplication>
 
-#include <ros/ros.h>
+//#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "turtlesim/turtle_frame.h"
 
 class TurtleApp : public QApplication
 {
 public:
-  ros::NodeHandlePtr nh_;
+  //ros::NodeHandlePtr nh_;
+  std::shared_ptr<rclcpp::node::Node> nh_;
 
   TurtleApp(int& argc, char** argv)
     : QApplication(argc, argv)
   {
-    ros::init(argc, argv, "turtlesim", ros::init_options::NoSigintHandler);
-    nh_.reset(new ros::NodeHandle);
+    //ros::init(argc, argv, "turtlesim", ros::init_options::NoSigintHandler);
+    rclcpp::init(argc, argv);
+    //nh_.reset(new ros::NodeHandle);
+    nh_ = rclcpp::create_node("turtlesim");
   }
 
   int exec()

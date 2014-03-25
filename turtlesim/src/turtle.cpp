@@ -39,7 +39,8 @@
 namespace turtlesim
 {
 
-Turtle::Turtle(const ros::NodeHandle& nh, const QImage& turtle_image, const QPointF& pos, float orient)
+//Turtle::Turtle(const ros::NodeHandle& nh, const QImage& turtle_image, const QPointF& pos, float orient)
+Turtle::Turtle(std::shared_ptr<rclcpp::node::Node> nh, const QImage& turtle_image, const QPointF& pos, float orient)
 : nh_(nh)
 , turtle_image_(turtle_image)
 , pos_(pos)
@@ -51,12 +52,15 @@ Turtle::Turtle(const ros::NodeHandle& nh, const QImage& turtle_image, const QPoi
 {
   pen_.setWidth(3);
 
-  velocity_sub_ = nh_.subscribe("cmd_vel", 1, &Turtle::velocityCallback, this);
-  pose_pub_ = nh_.advertise<Pose>("pose", 1);
-  color_pub_ = nh_.advertise<Color>("color_sensor", 1);
-  set_pen_srv_ = nh_.advertiseService("set_pen", &Turtle::setPenCallback, this);
-  teleport_relative_srv_ = nh_.advertiseService("teleport_relative", &Turtle::teleportRelativeCallback, this);
-  teleport_absolute_srv_ = nh_.advertiseService("teleport_absolute", &Turtle::teleportAbsoluteCallback, this);
+  //velocity_sub_ = nh_.subscribe("cmd_vel", 1, &Turtle::velocityCallback, this);
+  //velocity_sub_ = nh_->create_subscription<geometry_msgs::Twist>("cmd_vel", 1, ...);
+  //pose_pub_ = nh_.advertise<Pose>("pose", 1);
+  pose_pub_ = nh_->create_publisher<Pose>("pose", 1);
+  //color_pub_ = nh_.advertise<Color>("color_sensor", 1);
+  color_pub_ = nh_->create_publisher<Color>("color_sensor", 1);
+  //set_pen_srv_ = nh_.advertiseService("set_pen", &Turtle::setPenCallback, this);
+  //teleport_relative_srv_ = nh_.advertiseService("teleport_relative", &Turtle::teleportRelativeCallback, this);
+  //teleport_absolute_srv_ = nh_.advertiseService("teleport_absolute", &Turtle::teleportAbsoluteCallback, this);
 
   meter_ = turtle_image_.height();
   rotateImage();
@@ -156,7 +160,7 @@ bool Turtle::update(double dt, QPainter& path_painter, const QImage& path_image,
   if (pos_.x() < 0 || pos_.x() > canvas_width ||
       pos_.y() < 0 || pos_.y() > canvas_height)
   {
-    ROS_WARN("Oh no! I hit the wall! (Clamping from [x=%f, y=%f])", pos_.x(), pos_.y());
+    //ROS_WARN("Oh no! I hit the wall! (Clamping from [x=%f, y=%f])", pos_.x(), pos_.y());
   }
 
   pos_.setX(std::min(std::max(static_cast<double>(pos_.x()), 0.0), static_cast<double>(canvas_width)));
@@ -169,7 +173,7 @@ bool Turtle::update(double dt, QPainter& path_painter, const QImage& path_image,
   p.theta = orient_;
   p.linear_velocity = lin_vel_;
   p.angular_velocity = ang_vel_;
-  pose_pub_.publish(p);
+  pose_pub_->publish(p);
 
   // Figure out (and publish) the color underneath the turtle
   {
@@ -178,10 +182,10 @@ bool Turtle::update(double dt, QPainter& path_painter, const QImage& path_image,
     color.r = qRed(pixel);
     color.g = qGreen(pixel);
     color.b = qBlue(pixel);
-    color_pub_.publish(color);
+    color_pub_->publish(color);
   }
 
-  ROS_DEBUG("[%s]: pos_x: %f pos_y: %f theta: %f", nh_.getNamespace().c_str(), pos_.x(), pos_.y(), orient_);
+  //ROS_DEBUG("[%s]: pos_x: %f pos_y: %f theta: %f", nh_.getNamespace().c_str(), pos_.x(), pos_.y(), orient_);
 
   if (orient_ != old_orient)
   {

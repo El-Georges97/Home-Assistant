@@ -60,9 +60,11 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 
   connect(update_timer_, SIGNAL(timeout()), this, SLOT(onUpdate()));
 
-  nh_.setParam("background_r", DEFAULT_BG_R);
-  nh_.setParam("background_g", DEFAULT_BG_G);
-  nh_.setParam("background_b", DEFAULT_BG_B);
+  nh_ = rclcpp::create_node("turtlesim");
+
+  //nh_.setParam("background_r", DEFAULT_BG_R);
+  //nh_.setParam("background_g", DEFAULT_BG_G);
+  //nh_.setParam("background_b", DEFAULT_BG_B);
 
   QVector<QString> turtles;
   turtles.append("box-turtle.png");
@@ -74,7 +76,8 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
   turtles.append("groovy.png");
   turtles.append("hydro.svg");
 
-  QString images_path = (ros::package::getPath("turtlesim") + "/images/").c_str();
+  //QString images_path = (ros::package::getPath("turtlesim") + "/images/").c_str();
+  QString images_path = "";
   for (size_t i = 0; i < turtles.size(); ++i)
   {
     QImage img;
@@ -86,12 +89,12 @@ TurtleFrame::TurtleFrame(QWidget* parent, Qt::WindowFlags f)
 
   clear();
 
-  clear_srv_ = nh_.advertiseService("clear", &TurtleFrame::clearCallback, this);
-  reset_srv_ = nh_.advertiseService("reset", &TurtleFrame::resetCallback, this);
-  spawn_srv_ = nh_.advertiseService("spawn", &TurtleFrame::spawnCallback, this);
-  kill_srv_ = nh_.advertiseService("kill", &TurtleFrame::killCallback, this);
+  //clear_srv_ = nh_.advertiseService("clear", &TurtleFrame::clearCallback, this);
+  //reset_srv_ = nh_.advertiseService("reset", &TurtleFrame::resetCallback, this);
+  //spawn_srv_ = nh_.advertiseService("spawn", &TurtleFrame::spawnCallback, this);
+  //kill_srv_ = nh_.advertiseService("kill", &TurtleFrame::killCallback, this);
 
-  ROS_INFO("Starting turtlesim with node name %s", ros::this_node::getName().c_str()) ;
+  //ROS_INFO("Starting turtlesim with node name %s", ros::this_node::getName().c_str()) ;
 
   width_in_meters_ = (width() - 1) / meter_;
   height_in_meters_ = (height() - 1) / meter_;
@@ -108,7 +111,7 @@ bool TurtleFrame::spawnCallback(turtlesim::Spawn::Request& req, turtlesim::Spawn
   std::string name = spawnTurtle(req.name, req.x, req.y, req.theta);
   if (name.empty())
   {
-    ROS_ERROR("A turtled named [%s] already exists", req.name.c_str());
+    //ROS_ERROR("A turtled named [%s] already exists", req.name.c_str());
     return false;
   }
 
@@ -122,7 +125,7 @@ bool TurtleFrame::killCallback(turtlesim::Kill::Request& req, turtlesim::Kill::R
   M_Turtle::iterator it = turtles_.find(req.name);
   if (it == turtles_.end())
   {
-    ROS_ERROR("Tried to kill turtle [%s], which does not exist", req.name.c_str());
+    //ROS_ERROR("Tried to kill turtle [%s], which does not exist", req.name.c_str());
     return false;
   }
 
@@ -157,11 +160,11 @@ std::string TurtleFrame::spawnTurtle(const std::string& name, float x, float y, 
     }
   }
 
-  TurtlePtr t(new Turtle(ros::NodeHandle(real_name), turtle_images_[rand() % turtle_images_.size()], QPointF(x, y), angle));
+  TurtlePtr t(new Turtle(nh_, turtle_images_[rand() % turtle_images_.size()], QPointF(x, y), angle));
   turtles_[real_name] = t;
   update();
 
-  ROS_INFO("Spawning turtle [%s] at x=[%f], y=[%f], theta=[%f]", real_name.c_str(), x, y, angle);
+  //ROS_INFO("Spawning turtle [%s] at x=[%f], y=[%f], theta=[%f]", real_name.c_str(), x, y, angle);
 
   return real_name;
 }
@@ -172,9 +175,9 @@ void TurtleFrame::clear()
   int g = DEFAULT_BG_G;
   int b = DEFAULT_BG_B;
 
-  nh_.param("background_r", r, r);
-  nh_.param("background_g", g, g);
-  nh_.param("background_b", b, b);
+  //nh_.param("background_r", r, r);
+  //nh_.param("background_g", g, g);
+  //nh_.param("background_b", b, b);
 
   path_image_.fill(qRgb(r, g, b));
   update();
@@ -182,11 +185,13 @@ void TurtleFrame::clear()
 
 void TurtleFrame::onUpdate()
 {
-  ros::spinOnce();
+  //ros::spinOnce();
+  nh_->spin();
 
   updateTurtles();
 
-  if (!ros::ok())
+  //if (!ros::ok())
+  if(!nh_->is_running())
   {
     close();
   }
@@ -232,14 +237,14 @@ void TurtleFrame::updateTurtles()
 
 bool TurtleFrame::clearCallback(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
 {
-  ROS_INFO("Clearing turtlesim.");
+  //ROS_INFO("Clearing turtlesim.");
   clear();
   return true;
 }
 
 bool TurtleFrame::resetCallback(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
 {
-  ROS_INFO("Resetting turtlesim.");
+  //ROS_INFO("Resetting turtlesim.");
   turtles_.clear();
   id_counter_ = 0;
   spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0);
