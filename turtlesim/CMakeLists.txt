@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(turtlesim)
 
-find_package(catkin REQUIRED COMPONENTS geometry_msgs std_msgs std_srvs rclcpp)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs std_msgs std_srvs rclcpp roslib)
 
 find_package(Qt4 4.6 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})

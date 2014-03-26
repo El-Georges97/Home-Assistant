@@ -31,7 +31,7 @@
 
 #include <QPointF>
 
-//#include <ros/package.h>
+#include <ros/package.h>
 #include <cstdlib>
 #include <ctime>
 #include <unistd.h>
@@ -76,12 +76,8 @@ TurtleFrame::TurtleFrame(std::shared_ptr<rclcpp::node::Node> nh)
   turtles.append("groovy.png");
   turtles.append("hydro.svg");
 
-  //QString images_path = (ros::package::getPath("turtlesim") + "/images/").c_str();
-  char cwd[PATH_MAX];
-  getcwd(cwd, sizeof(cwd));
-  std::string path(cwd);
-  path += "/../images/";
-  QString images_path = path.c_str();
+  QString images_path = (ros::package::getPath("turtlesim") + "/images/").c_str();
+  std::cout << images_path.toStdString().c_str() << std::endl;
   for (size_t i = 0; i < turtles.size(); ++i)
   {
     QImage img;
