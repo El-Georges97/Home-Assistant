@@ -12,12 +12,12 @@ link_directories(${catkin_LIBRARY_DIRS})
 
 add_message_files(DIRECTORY msg FILES 
                   Color.msg Pose.msg)
-#add_service_files(DIRECTORY srv FILES
-#                  Kill.srv
-#                  SetPen.srv
-#                  Spawn.srv
-#                  TeleportAbsolute.srv
-#                  TeleportRelative.srv)
+add_service_files(DIRECTORY srv FILES
+                  Kill.srv
+                  SetPen.srv
+                  Spawn.srv
+                  TeleportAbsolute.srv
+                  TeleportRelative.srv)
 generate_messages(DEPENDENCIES geometry_msgs std_msgs std_srvs)
 
 catkin_package(CATKIN_DEPENDS geometry_msgs std_msgs std_srvs rclcpp)
